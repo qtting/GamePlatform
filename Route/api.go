@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qiankaihua/ginDemo/Boot/Http"
 	"github.com/qiankaihua/ginDemo/Controller/Auth"
+	"github.com/qiankaihua/ginDemo/Controller/Game"
+
 	//"github.com/qiankaihua/ginDemo/Controller/Game"
 )
 
@@ -23,10 +25,12 @@ func AddApiRoute() {
 		auth.POST("login", Auth.Login)
 	}
 
-	//gameload := Http.Router.Group("/game")
+	gameload := Http.Router.Group("/game")
 	{
-		//gameload.GET("download",Game.Download)
-		//
-		//gameload.POST("upload",Game.Upload)
+		gameload.GET("",Game.Download)
+
+		gameload.POST("",Game.FileUp)
+
+		gameload.GET("list",Game.List)
 	}
 }

@@ -6,8 +6,6 @@ import (
 )
 
 type ApiToken struct {
-	gorm.Model
-
 	Id        int    `gorm:"not null"`
 	Token     string `gorm:"not null"`
 	UserName  string `gorm:"not null"`
@@ -18,7 +16,11 @@ func (apiToken ApiToken) TableName() string {
 }
 
 func (apiToken *ApiToken) BeforeCreate(scope *gorm.Scope) error {
-	_ = scope.SetColumn("Token", interface{}(uuid.NewV4()))
+	//var a = uuid.NewV4()
+	//fmt.Println(a)
+	//_ = scope.SetColumn("Token", interface{}(a))
+	apiToken.Token = uuid.NewV4().String()
+
 	return nil
 }
 //

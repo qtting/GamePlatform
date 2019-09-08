@@ -2,6 +2,7 @@ package Auth
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/qiankaihua/ginDemo/Boot/Log"
 	"github.com/qiankaihua/ginDemo/Boot/Orm"
 	"github.com/qiankaihua/ginDemo/Controller"
 	"github.com/qiankaihua/ginDemo/Model"
@@ -35,28 +36,29 @@ import (
  */
 
 type LoginValidate struct {
-	Username   string  `json:"username" binding:"required,len=20"`
-	Password   string  `json:"password" binding:"required,len=40"`
+	Username   string  `json:"username" binding:"required"`
+	Password   string  `json:"password" binding:"required"`
 }
 
 func Login(c *gin.Context) {
 	var data LoginValidate
 	if err := c.ShouldBindJSON(&data); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "格式不正确哦"})
+		c.JSON(http.StatusBadRequest, gin.H{"err_msg": "格式不正确哦"})
+		Log.Info(err.Error())
 		return
 	}
 	var user Model.User
 	db := Orm.GetDB()
 	if db.Where("username = ?", data.Username).First(&user).RecordNotFound() {
-		c.JSON(401, gin.H{"message": "用户名或密码错误"})
+		c.JSON(401, gin.H{"err_msg": "用户名或密码错误"})
 		return
 	}
 	if !Controller.Sha256Check(user.Password, data.Password) {
-		c.JSON(401, gin.H{"message": "用户名或密码错误"})
+		c.JSON(401, gin.H{"err_msg": "用户名或密码错误"})
 		return
 	}
 	var apiToken = Model.ApiToken{UserName: user.Username}
 	//apiToken.AddTime(data.Remember)
 	db.Create(&apiToken)
-	c.JSON(200, gin.H{"token": apiToken.Token})
+	c.JSON(200, gin.H{"data": apiToken.Token})
 }
